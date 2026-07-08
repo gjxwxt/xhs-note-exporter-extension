@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>XHS Note Capture</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="panel">
+      <section class="hero">
+        <h1>小红书帖子采集</h1>
+        <p>选择采集任务后，可手动采集当前帖子，或开启自动采集，让新打开的帖子自动追加到同一个 Excel 任务里。</p>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>采集任务</h2>
+          <button id="newTaskButton" class="ghost" type="button">新建任务</button>
+        </div>
+
+        <label class="field">
+          <span>当前任务</span>
+          <select id="taskSelect"></select>
+        </label>
+
+        <section id="createTaskPanel" class="create-panel" hidden>
+          <label class="field">
+            <span>任务名称</span>
+            <input id="taskNameInput" type="text" maxlength="60" placeholder="例如：2026年7月-某品牌账号">
+          </label>
+          <div class="button-row compact">
+            <button id="confirmCreateButton" class="primary" type="button">确认新建</button>
+            <button id="cancelCreateButton" class="secondary" type="button">取消</button>
+          </div>
+        </section>
+
+        <div class="stats">
+          <article class="stat">
+            <span>已采集</span>
+            <strong id="noteCount">0</strong>
+          </article>
+          <article class="stat">
+            <span>本次新增</span>
+            <strong id="sessionCount">0</strong>
+          </article>
+          <article class="stat">
+            <span>最近更新</span>
+            <strong id="updatedAt">-</strong>
+          </article>
+        </div>
+
+        <p id="taskMeta" class="meta">还没有采集任务。点击“新建任务”后开始采集。</p>
+      </section>
+
+      <div class="button-row">
+        <button id="captureButton" class="primary" type="button">采集当前帖子</button>
+        <button id="exportButton" class="secondary" type="button">高清导出</button>
+      </div>
+
+      <div class="button-row">
+        <button id="quickExportButton" class="secondary" type="button">快速导出</button>
+        <button id="clearButton" class="secondary" type="button">清空当前任务</button>
+      </div>
+
+      <div class="batch-export-options">
+        <label class="checkbox-label">
+          <input id="batchExportCheckbox" type="checkbox">
+          <span>分批导出（每批最多 <input id="batchSizeInput" type="number" value="50" min="10" max="200" class="inline-number"> 条）</span>
+        </label>
+      </div>
+      <div class="quality-options">
+        <span class="quality-label">封面图质量：</span>
+        <select id="imageQualitySelect" class="quality-select">
+          <option value="hd">高清 (1600px)</option>
+          <option value="standard" selected>标准 (800px)</option>
+          <option value="thumbnail">缩略图 (400px)</option>
+        </select>
+      </div>
+      <div class="export-help">
+        <p>高清导出：带封面图，适合最终留档或少量精细分析。</p>
+        <p>快速导出：不带封面图，适合大批量数据，速度更快。</p>
+      </div>
+
+      <section class="card auto-card">
+        <div class="section-head">
+          <h2>自动采集</h2>
+          <button id="autoCaptureButton" class="secondary" type="button">开启自动采集</button>
+        </div>
+        <p id="autoCaptureMeta" class="meta">关闭中。开启后会监听帖子详情页路由变化，未采集过的帖子会自动入库。</p>
+      </section>
+
+      <div class="button-row single">
+        <button id="deleteTaskButton" class="danger" type="button">删除当前任务</button>
+      </div>
+
+      <section class="card preview-card">
+        <div class="section-head">
+          <h2>最近一条</h2>
+        </div>
+        <p id="lastTitle" class="preview-title">还没有采集记录。</p>
+        <p id="lastInfo" class="preview-info">打开帖子详情页后，点击“采集当前帖子”即可。</p>
+      </section>
+
+      <section class="card list-card">
+        <div class="section-head">
+          <h2>已采集标题</h2>
+        </div>
+        <div id="capturedList" class="captured-list empty">
+          <p class="list-empty">当前任务还没有采集记录。</p>
+        </div>
+      </section>
+
+      <p id="status" class="status">先选择采集任务。手动采集和自动采集都会按帖子链接去重。</p>
+      <p id="runtimeIssue" class="runtime-issue" hidden></p>
+      <div id="errorPanel" class="error-panel" hidden>
+        <div class="error-panel-head">
+          <span>最近异常记录</span>
+          <button id="errorPanelClose" class="ghost small" type="button">关闭</button>
+        </div>
+        <div id="errorList" class="error-list"></div>
+      </div>
+      <p class="tip">自动采集开启后，打开新帖子会自动采集；已采集过的帖子会自动跳过。快速导出不带封面图，适合大批量数据。</p>
+      <p class="tip privacy-tip">本扩展仅在你打开的小红书页面中读取帖子内容，并把采集结果保存在浏览器本地或导出为 Excel；不会上传到开发者服务器。</p>
+    </main>
+
+    <div id="confirmModal" class="modal-overlay" hidden>
+      <div class="modal-dialog">
+        <p id="confirmMessage" class="confirm-message"></p>
+        <div class="button-row compact">
+          <button id="confirmOk" class="primary" type="button">确认</button>
+          <button id="confirmCancel" class="secondary" type="button">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
